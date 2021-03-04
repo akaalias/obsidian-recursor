@@ -50,6 +50,6 @@ export default class RecursorPlugin extends Plugin {
 
 		this.settings.positions[basename] = cursor;
 
-		await this.saveSettings();
+		this.saveSettings();
 	}
 }
