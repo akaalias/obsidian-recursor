@@ -1,10 +1,27 @@
 import {Plugin} from 'obsidian';
 
+interface MyPluginSettings {
+	positions: any;
+}
+
+const DEFAULT_SETTINGS: MyPluginSettings = {
+	positions: new Map()
+}
+
 export default class RecursorPlugin extends Plugin {
-	private positions: Map<string, CodeMirror.Position>;
+	settings: MyPluginSettings;
+
+	async loadSettings() {
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+	}
+
+	async saveSettings() {
+		await this.saveData(this.settings);
+	}
 
 	async onload() {
-		this.positions = new Map<string, CodeMirror.Position>();
+		await this.loadSettings();
+
 		this.registerCodeMirror((cm: CodeMirror.Editor) => {
 			cm.on("keydown", this.handleKeyDown);
 			cm.on("mousedown", this.handleKeyDown);
@@ -17,9 +34,9 @@ export default class RecursorPlugin extends Plugin {
 	): void => {
 		if(!this.app.workspace.getActiveFile()) return;
 		let basename = this.app.workspace.getActiveFile().basename;
-		if(!this.positions) return;
-		if(this.positions.has(basename)) {
-			let cursor = this.positions.get(basename)
+
+		if(this.settings.positions[basename] != null) {
+			let cursor = this.settings.positions[basename];
 			cm.setCursor(cursor);
 			cm.scrollTo(cursor.line);
 		}
@@ -30,7 +47,9 @@ export default class RecursorPlugin extends Plugin {
 	): void => {
 		let basename = this.app.workspace.getActiveFile().basename;
 		const cursor = cm.getCursor();
-		if(!this.positions) return;
-		this.positions.set(basename, cursor);
+
+		this.settings.positions[basename] = cursor;
+
+		await this.saveSettings();
 	}
 }
