@@ -12,6 +12,6 @@ It will...
 
 
 ## Backlog
-- [ ] Handle saving before quitting Obsidian
+- [ ] Figure out why scrollTo(cursor) isn't scrolling
 - [ ] Handle file rename
 - [ ] Handle file delete
