@@ -1,7 +1,7 @@
 import {Plugin} from 'obsidian';
 
-export default class RememberCursorPlugin extends Plugin {
-	positions: Map<string, CodeMirror.Position>;
+export default class RecursorPlugin extends Plugin {
+	private positions: Map<string, CodeMirror.Position>;
 
 	async onload() {
 		this.positions = new Map<string, CodeMirror.Position>();
@@ -11,12 +11,13 @@ export default class RememberCursorPlugin extends Plugin {
 			cm.on("focus", this.handleOpen);
 		});
 	}
-	
+
 	private readonly handleOpen = (
 		cm: CodeMirror.Editor
 	): void => {
 		if(!this.app.workspace.getActiveFile()) return;
 		let basename = this.app.workspace.getActiveFile().basename;
+		if(!this.positions) return;
 		if(this.positions.has(basename)) {
 			let cursor = this.positions.get(basename)
 			cm.setCursor(cursor);
@@ -29,6 +30,7 @@ export default class RememberCursorPlugin extends Plugin {
 	): void => {
 		let basename = this.app.workspace.getActiveFile().basename;
 		const cursor = cm.getCursor();
+		if(!this.positions) return;
 		this.positions.set(basename, cursor);
 	}
 }
