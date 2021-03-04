@@ -1,4 +1,4 @@
-import {Plugin} from 'obsidian';
+import {MarkdownView, Plugin} from 'obsidian';
 
 interface MyPluginSettings {
 	positions: any;
@@ -23,33 +23,54 @@ export default class RecursorPlugin extends Plugin {
 		await this.loadSettings();
 
 		this.registerCodeMirror((cm: CodeMirror.Editor) => {
-			cm.on("keydown", this.handleKeyDown);
-			cm.on("mousedown", this.handleKeyDown);
-			cm.on("focus", this.handleOpen);
+			// track cursor
+			cm.on("keydown", this.handleChange);
+
+			// set cursor
+			cm.on("refresh", this.setCursorOnFocus);
 		});
 	}
 
-	private readonly handleOpen = (
+	private setCursorOnFocus = (
 		cm: CodeMirror.Editor
 	): void => {
+		console.log("-------------------------------");
+		console.log("REFRESH event");
+		this.setCursor(cm);
+		console.log("-------------------------------");
+	}
+
+	private setCursor = (
+		cm: CodeMirror.Editor
+	): void => {
+		let mdView = this.app.workspace.getActiveViewOfType(MarkdownView);
+		if(!mdView) { return }
+		if(mdView.sourceMode == undefined) return;
+
 		if(!this.app.workspace.getActiveFile()) return;
 		let basename = this.app.workspace.getActiveFile().basename;
 
+		console.log("Positions:");
+		console.log(this.settings.positions);
+
 		if(this.settings.positions[basename] != null) {
 			let cursor = this.settings.positions[basename];
+			console.log(basename + " - Moving cursor to: ");
+			console.log(cursor);
 			cm.setCursor(cursor);
-			cm.scrollTo(cursor.line);
+			cm.scrollIntoView(cursor.line);
+		} else {
+			console.log(basename + " - We have no previous position")
 		}
 	}
 
-	private readonly handleKeyDown = (
+	private readonly handleChange = (
 		cm: CodeMirror.Editor
 	): void => {
 		let basename = this.app.workspace.getActiveFile().basename;
 		const cursor = cm.getCursor();
 
 		this.settings.positions[basename] = cursor;
-
 		this.saveSettings();
 	}
 }
