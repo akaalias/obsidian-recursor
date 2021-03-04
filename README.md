@@ -8,7 +8,7 @@ It will...
 - Place your cursor back to the previous position 
 - Save the positions when you exit Obsidian
 
-![Basic Functionality](https://github.com/akaalias/extract-highlights-plugin/blob/master/demo.gif?raw=true)
+![Basic Functionality](https://github.com/akaalias/obsidian-recursor/blob/master/demo.gif?raw=true)
 
 
 ## Backlog
