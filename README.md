@@ -15,6 +15,6 @@ It will...
 Based on [this forum thread](https://forum.obsidian.md/t/remember-position-when-switching-between-notes/1719/) by [alexobsidian](https://forum.obsidian.md/u/alexobsidian/summary).
 
 ## Backlog
-- [ ] Figure out why scrollTo(cursor) isn't scrolling
+- [ ] Figure out why scrollTo(cursor) isn't fully scrolling
 - [ ] Handle file rename
 - [ ] Handle file delete
