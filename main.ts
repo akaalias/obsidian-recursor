@@ -15,6 +15,7 @@ export default class RecursorPlugin extends Plugin {
 		this.registerCodeMirror((cm: CodeMirror.Editor) => {
 			// track cursor
 			cm.on("keydown", this.handleChange);
+			cm.on("click", this.handleChange);
 
 			// set cursor
 			cm.on("refresh", this.setCursor);
@@ -30,17 +31,10 @@ export default class RecursorPlugin extends Plugin {
 		if(!this.app.workspace.getActiveFile()) return;
 		let basename = this.app.workspace.getActiveFile().basename;
 
-		// console.log("Positions:");
-		// console.log(this.settings.positions);
-
 		if(this.settings.positions[basename] != null) {
 			let cursor = this.settings.positions[basename];
-			// console.log(basename + " - Moving cursor to: ");
-			// console.log(cursor);
 			cm.setCursor(cursor);
 			cm.scrollIntoView(null);
-		} else {
-			// console.log(basename + " - We have no previous position")
 		}
 	}
 
