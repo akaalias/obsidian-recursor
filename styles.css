@@ -1,1 +1,10 @@
 /* */
+.highlight {
+    border-left: 3px solid yellow;
+}
+
+.CodeMirror-cursor {
+    border-left-width: 0.7em;
+    border-color: yellow;
+    opacity: 0.70;
+}

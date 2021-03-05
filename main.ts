@@ -1,24 +1,14 @@
 import {MarkdownView, Plugin} from 'obsidian';
 
-interface MyPluginSettings {
-	positions: any;
-}
-
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	positions: new Map()
-}
+interface RecursorPluginSettings { positions: any; }
+const DEFAULT_SETTINGS: RecursorPluginSettings = { positions: new Map() }
 
 export default class RecursorPlugin extends Plugin {
-	settings: MyPluginSettings;
+	settings: RecursorPluginSettings;
 
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
-
+	async loadSettings() { this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData()); }
+	async saveSettings() { await this.saveData(this.settings); }
+	
 	async onload() {
 		await this.loadSettings();
 
@@ -27,22 +17,12 @@ export default class RecursorPlugin extends Plugin {
 			cm.on("keydown", this.handleChange);
 
 			// set cursor
-			cm.on("refresh", this.setCursorOnFocus);
+			cm.on("refresh", this.setCursor);
+			cm.on("focus", this.setCursor);
 		});
 	}
 
-	private setCursorOnFocus = (
-		cm: CodeMirror.Editor
-	): void => {
-		console.log("-------------------------------");
-		console.log("REFRESH event");
-		this.setCursor(cm);
-		console.log("-------------------------------");
-	}
-
-	private setCursor = (
-		cm: CodeMirror.Editor
-	): void => {
+	private setCursor = ( cm: CodeMirror.Editor ): void => {
 		let mdView = this.app.workspace.getActiveViewOfType(MarkdownView);
 		if(!mdView) { return }
 		if(mdView.sourceMode == undefined) return;
@@ -50,23 +30,21 @@ export default class RecursorPlugin extends Plugin {
 		if(!this.app.workspace.getActiveFile()) return;
 		let basename = this.app.workspace.getActiveFile().basename;
 
-		console.log("Positions:");
-		console.log(this.settings.positions);
+		// console.log("Positions:");
+		// console.log(this.settings.positions);
 
 		if(this.settings.positions[basename] != null) {
 			let cursor = this.settings.positions[basename];
-			console.log(basename + " - Moving cursor to: ");
-			console.log(cursor);
+			// console.log(basename + " - Moving cursor to: ");
+			// console.log(cursor);
 			cm.setCursor(cursor);
-			cm.scrollIntoView(cursor.line);
+			cm.scrollIntoView(null);
 		} else {
-			console.log(basename + " - We have no previous position")
+			// console.log(basename + " - We have no previous position")
 		}
 	}
 
-	private readonly handleChange = (
-		cm: CodeMirror.Editor
-	): void => {
+	private readonly handleChange = ( cm: CodeMirror.Editor ): void => {
 		let basename = this.app.workspace.getActiveFile().basename;
 		const cursor = cm.getCursor();
 
