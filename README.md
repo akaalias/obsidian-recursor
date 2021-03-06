@@ -10,6 +10,9 @@ It will...
 
 ![Basic Functionality](https://github.com/akaalias/obsidian-recursor/blob/master/demo.gif?raw=true)
 
+## Reporting issues
+If you discover something not working, [please submit an issue here](https://github.com/akaalias/obsidian-recursor/issues). Thank you!
+
 ## Origins
 
 Based on [this forum thread](https://forum.obsidian.md/t/remember-position-when-switching-between-notes/1719/) by [alexobsidian](https://forum.obsidian.md/u/alexobsidian/summary).
