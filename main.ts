@@ -4,7 +4,8 @@ interface RecursorPluginSettings { positions: any; }
 const DEFAULT_SETTINGS: RecursorPluginSettings = { positions: new Map() }
 
 export default class RecursorPlugin extends Plugin {
-	settings: RecursorPluginSettings;
+	private settings: RecursorPluginSettings;
+	private lastKey: string;
 
 	async loadSettings() { this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData()); }
 	async saveSettings() { await this.saveData(this.settings); }
@@ -14,13 +15,27 @@ export default class RecursorPlugin extends Plugin {
 
 		this.registerCodeMirror((cm: CodeMirror.Editor) => {
 			// track cursor
-			cm.on("keydown", this.handleChange);
-			cm.on("click", this.handleChange);
+			cm.on("keydown", this.handleKeyDownChange);
+			cm.on("click", this.handleClickChange);
 
 			// set cursor
-			cm.on("refresh", this.setCursor);
-			cm.on("focus", this.setCursor);
+			cm.on("refresh", this.setRefreshCursor);
+			cm.on("focus", this.setFocusCursor);
 		});
+	}
+
+	private setRefreshCursor = ( cm: CodeMirror.Editor): void => {
+		const skipEvents = ["Enter", "#"]
+		if(skipEvents.contains(this.lastKey)) {
+			console.log("Skipping refresh for " + this.lastKey);
+			return;
+		}
+		this.setCursor(cm);
+	}
+
+	private setFocusCursor = ( cm: CodeMirror.Editor ): void => {
+		// console.log("Focus event");
+		this.setCursor(cm);
 	}
 
 	private setCursor = ( cm: CodeMirror.Editor ): void => {
@@ -38,7 +53,16 @@ export default class RecursorPlugin extends Plugin {
 		}
 	}
 
-	private readonly handleChange = ( cm: CodeMirror.Editor ): void => {
+	private readonly handleClickChange = ( cm: CodeMirror.Editor): void => {
+		this.handleChange(cm);
+	}
+
+	private readonly handleKeyDownChange = ( cm: CodeMirror.Editor, event: KeyboardEvent ): void => {
+		this.lastKey = event.key;
+		this.handleChange(cm);
+	}
+
+	private readonly handleChange = ( cm: CodeMirror.Editor): void => {
 		let basename = this.app.workspace.getActiveFile().basename;
 		const cursor = cm.getCursor();
 
